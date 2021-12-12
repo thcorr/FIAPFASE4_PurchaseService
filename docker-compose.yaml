@@ -1,0 +1,39 @@
+version: '3'
+services:
+ rabbitmqeightshop:
+  image: rabbitmq:3-management
+  container_name: rabbitmqeightshop
+  restart: always
+  ports: 
+   - 5672:5672
+   - 5673:5673
+   - 15672:15672
+  volumes: 
+   - ./rabbitmqdata:/var/lib/rabbitmq/
+  environment:
+   - RABBITMQ_DEFAULT_USER=admin
+   - RABBITMQ_DEFAULT_PASS=admin
+
+ purchaseservice:
+  image: thocorr/fiapfase4_purchaseservice:latest
+  container_name: purchaseservice
+  ports:
+   - 9088:9088
+  environment:
+   - spring_rabbitmq_host=rabbitmqeightshop
+  restart: on-failure
+  depends_on:
+   - rabbitmqeightshop
+   
+ notificationservice:
+  image: thocorr/fiapfase4_notificationservice:latest
+  container_name: notificationservice
+  ports:
+   - 7088:7088
+  environment:
+   - spring_rabbitmq_host=rabbitmqeightshop
+  restart: on-failure
+  depends_on:
+   - rabbitmqeightshop
+   
+
